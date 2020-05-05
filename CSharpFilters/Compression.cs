@@ -212,10 +212,6 @@ namespace HWFilters.Compression
         }
         public void RemoveNode(HuffmanListNode<T> node)
         {
-            if (node.prev == null && node.next == null)
-            {
-                Console.Write("");
-            }
             if (node.prev == null)
             {
                 start = node.next;

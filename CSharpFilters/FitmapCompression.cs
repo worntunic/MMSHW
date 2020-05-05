@@ -85,7 +85,6 @@ namespace HWFilters
                 BitArray bits = bitStream.ReadBits(codeLength);
                 HFCode code = HFCode.FromBits(bits);
                 readTable.Add(code, value);
-                //Console.WriteLine($"{value}:{code.length}:{code.GetStringCode()}");
             }
             //Reconstruct tree
             HuffmanTree<byte> hfTree = HuffmanTree<byte>.ReconstructFromTable(readTable);
@@ -170,7 +169,6 @@ namespace HWFilters
             foreach (KeyValuePair<byte, HFCode> pair in table)
             {
                 bitStream.WriteBits(pair.Value.GetBitCode());
-                //Console.WriteLine($"{pair.Key}:{pair.Value.length}");
             }
             //Write Data
             long dataLength = 0;
@@ -238,7 +236,6 @@ namespace HWFilters
                 BitArray bits = bitStream.ReadBits(codeLength);
                 HFCode code = HFCode.FromBits(bits);
                 cReadTable.Add(code, value);
-                //Console.WriteLine($"{value}:{code.length}:{code.GetStringCode()}");
             }
             //M
             for (int i = 0; i < mDictLength; ++i)
@@ -248,7 +245,6 @@ namespace HWFilters
                 BitArray bits = bitStream.ReadBits(codeLength);
                 HFCode code = HFCode.FromBits(bits);
                 mReadTable.Add(code, value);
-                //Console.WriteLine($"{value}:{code.length}:{code.GetStringCode()}");
             }
             //Y
             for (int i = 0; i < yDictLength; ++i)
@@ -366,17 +362,14 @@ namespace HWFilters
             foreach (KeyValuePair<byte, HFCode> pair in cTable)
             {
                 bitStream.WriteBits(pair.Value.GetBitCode());
-                //Console.WriteLine($"{pair.Key}:{pair.Value.length}");
             }
             foreach (KeyValuePair<byte, HFCode> pair in mTable)
             {
                 bitStream.WriteBits(pair.Value.GetBitCode());
-                //Console.WriteLine($"{pair.Key}:{pair.Value.length}");
             }
             foreach (KeyValuePair<byte, HFCode> pair in yTable)
             {
                 bitStream.WriteBits(pair.Value.GetBitCode());
-                //Console.WriteLine($"{pair.Key}:{pair.Value.length}");
             }
             //Write Data
             long dataLength = 0;
