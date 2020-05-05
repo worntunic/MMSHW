@@ -17,11 +17,15 @@ namespace HWFilters
     public class Fitmap
     {      
         //Constants
-        private const ushort commonHeaderSize = 8;
+        private const ushort commonHeaderSize = 10;
+        private const byte latestVersion = 1;
+        private const ushort versionZeroHeaderSize = 8;
+        private const byte headerInfoData = 5;
         //Header data
-        private ushort fullSize;
         private ushort headerSize;
-        //Image data
+        private ushort fullSize;
+        private byte fitmapVersion;
+        private byte compressionType;
         private ushort width;
         private ushort height;
         //Constructed Data
@@ -29,11 +33,19 @@ namespace HWFilters
         private byte[] mBytes;
         private byte[] yBytes;
 
+        public int Width() => width;
+        public int Height() => height;
+        public byte[] CValues => cBytes;
+        public byte[] MValues => mBytes;
+        public byte[] YValues => yBytes;
+
         public Fitmap(Bitmap bitmap)
         {
             this.width = (ushort)bitmap.Width;
             this.height = (ushort)bitmap.Height;
             this.headerSize = commonHeaderSize;
+            this.fitmapVersion = latestVersion;
+            SetCompressionAlg(FitmapCompression.CompressionType.NoCompression);
             DownsampleImage(bitmap);
             fullSize = (ushort)(headerSize + cBytes.Length + mBytes.Length + yBytes.Length);
         }
@@ -41,11 +53,14 @@ namespace HWFilters
         {
 
         }
+        public void SetCompressionAlg(FitmapCompression.CompressionType compressionType)
+        {
+            this.compressionType = (byte)compressionType;
+        }
         public Bitmap GetBitmap()
         {
             return UpsampleImage();
         }
-
         #region Sampling
         private int GetSampledRowLength()
         {
@@ -144,34 +159,47 @@ namespace HWFilters
         #region File Management
         public void SaveToFile(string fileName)
         {
+            if (File.Exists(fileName))
+            {
+                File.Delete(fileName);
+            }
             FileStream fStream = new FileStream(fileName, FileMode.OpenOrCreate);
             /*byte[] header = new byte[headerSize];
             byte[] tmp = BitConverter.GetBytes(headerSize);*/
             fStream.Write(BitConverter.GetBytes(headerSize), 0, 2);
             fStream.Write(BitConverter.GetBytes(fullSize), 0, 2);
+            fStream.Write(BitConverter.GetBytes(fitmapVersion), 0, 1);
+            fStream.Write(BitConverter.GetBytes(compressionType), 0, 1);
             fStream.Write(BitConverter.GetBytes(width), 0, 2);
             fStream.Write(BitConverter.GetBytes(height), 0, 2);
-            int fullStep = cBytes.Length / 100;
-            int halfStep = mBytes.Length / 100;
-            int curOffset = 0;
-            for (int i = 0; i < 100; ++i)
-            {
-                fStream.Write(cBytes, curOffset, fullStep);
-                curOffset += fullStep;
-            }
-            curOffset = 0;
-            for (int i = 0; i < 100; ++i)
-            {
-                fStream.Write(mBytes, curOffset, halfStep);
-                curOffset += halfStep;
-            }
-            curOffset = 0;
-            for (int i = 0; i < 100; ++i)
-            {
-                fStream.Write(yBytes, curOffset, halfStep);
-                curOffset += halfStep;
-            }
+            FitmapCompression.Write(compressionType, cBytes, mBytes, yBytes, fStream);
             fStream.Close();
+        }
+        private void ReadHeaderV0(FileStream fStream)
+        {
+            byte[] header = new byte[headerSize - 2];
+            fStream.Read(header, 0, headerSize - 2);
+            fullSize = BitConverter.ToUInt16(header, 0);
+            width = BitConverter.ToUInt16(header, 2);
+            height = BitConverter.ToUInt16(header, 4);
+        }
+        private void ReadHeaderInfo(FileStream fStream)
+        {
+            byte[] header = new byte[headerInfoData - 2];
+            fStream.Read(header, 0, headerInfoData - 2);
+            fullSize = BitConverter.ToUInt16(header, 0);
+            fitmapVersion = header[2];
+        }
+        private void ReadHeaderBasedOnVersion(FileStream fStream)
+        {
+            byte[] header = new byte[headerSize - headerInfoData];
+            if (fitmapVersion == 1)
+            {
+                fStream.Read(header, 0, header.Length);
+                compressionType = header[0];
+                width = BitConverter.ToUInt16(header, 1);
+                height = BitConverter.ToUInt16(header, 3);
+            }
         }
         public static Fitmap LoadFromFile(string fileName)
         {
@@ -180,41 +208,23 @@ namespace HWFilters
             byte[] headerSize = new byte[2];
             fStream.Read(headerSize, 0, 2);
             f.headerSize = BitConverter.ToUInt16(headerSize, 0);
-            byte[] header = new byte[f.headerSize - 2];
-            fStream.Read(header, 0, f.headerSize - 2);
-            f.fullSize = BitConverter.ToUInt16(header, 0);
-            f.width = BitConverter.ToUInt16(header, 2);
-            f.height = BitConverter.ToUInt16(header, 4);
-
+            if (f.headerSize == versionZeroHeaderSize)
+            {
+                f.ReadHeaderV0(fStream);
+                f.fitmapVersion = 0;
+                f.compressionType = 0;
+            } else
+            {
+                f.ReadHeaderInfo(fStream);
+                f.ReadHeaderBasedOnVersion(fStream);
+            }
             int cLength = f.width * f.height;
             int sampledLength = f.GetSampledRowLength() * f.height;
             f.cBytes = new byte[cLength];
             f.mBytes = new byte[sampledLength];
             f.yBytes = new byte[sampledLength];
-
-            int fullStep = cLength / 100;
-            int halfStep = sampledLength / 100;
-            int curOffset = 0;
-
-            for (int i = 0; i < 100; ++i)
-            {
-                fStream.Read(f.cBytes, curOffset, fullStep);
-                curOffset += fullStep;
-            }
-            curOffset = 0;
-            for (int i = 0; i < 100; ++i)
-            {
-                fStream.Read(f.mBytes, curOffset, halfStep);
-                curOffset += halfStep;
-            }
-            curOffset = 0;
-            for (int i = 0; i < 100; ++i)
-            {
-                fStream.Read(f.yBytes, curOffset, halfStep);
-                curOffset += halfStep;
-            }
+            FitmapCompression.Read(f.compressionType, f.cBytes, f.mBytes, f.yBytes, fStream);
             fStream.Close();
-
             return f;
         }
         #endregion

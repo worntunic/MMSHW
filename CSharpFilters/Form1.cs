@@ -7,6 +7,7 @@ using System.Windows.Forms;
 using System.Data;
 using HWFilters;
 using System.IO;
+using HWFilters.Compression;
 
 namespace CSharpFilters
 {
@@ -53,6 +54,10 @@ namespace CSharpFilters
         private MenuItem menuItem6;
         private MenuItem HW_Fitmap_Downsample;
         private MenuItem HW_Fitmap_Load;
+        private MenuItem HW_Fitmap_FullHuffman;
+        private MenuItem HW_Fitmap_LoadFullHuffman;
+        private MenuItem HW_Fitmap_ChannelHuffman;
+        private MenuItem HW_Fitmap_LoadChannelHuffman;
         private IContainer components;
 
 		public Form1()
@@ -120,6 +125,10 @@ namespace CSharpFilters
             this.menuItem6 = new System.Windows.Forms.MenuItem();
             this.HW_Fitmap_Downsample = new System.Windows.Forms.MenuItem();
             this.HW_Fitmap_Load = new System.Windows.Forms.MenuItem();
+            this.HW_Fitmap_FullHuffman = new System.Windows.Forms.MenuItem();
+            this.HW_Fitmap_LoadFullHuffman = new System.Windows.Forms.MenuItem();
+            this.HW_Fitmap_ChannelHuffman = new System.Windows.Forms.MenuItem();
+            this.HW_Fitmap_LoadChannelHuffman = new System.Windows.Forms.MenuItem();
             this.SuspendLayout();
             // 
             // mainMenu1
@@ -351,7 +360,11 @@ namespace CSharpFilters
             this.menuItem6.Index = 5;
             this.menuItem6.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
             this.HW_Fitmap_Downsample,
-            this.HW_Fitmap_Load});
+            this.HW_Fitmap_Load,
+            this.HW_Fitmap_FullHuffman,
+            this.HW_Fitmap_LoadFullHuffman,
+            this.HW_Fitmap_ChannelHuffman,
+            this.HW_Fitmap_LoadChannelHuffman});
             this.menuItem6.Text = "Fitmap";
             // 
             // HW_Fitmap_Downsample
@@ -365,6 +378,30 @@ namespace CSharpFilters
             this.HW_Fitmap_Load.Index = 1;
             this.HW_Fitmap_Load.Text = "Load";
             this.HW_Fitmap_Load.Click += new System.EventHandler(this.HW_Filter_Fitmap_Load);
+            // 
+            // HW_Fitmap_FullHuffman
+            // 
+            this.HW_Fitmap_FullHuffman.Index = 2;
+            this.HW_Fitmap_FullHuffman.Text = "FullHuffman";
+            this.HW_Fitmap_FullHuffman.Click += new System.EventHandler(this.HW_Filter_Fitmap_FullHuffman);
+            // 
+            // HW_Fitmap_LoadFullHuffman
+            // 
+            this.HW_Fitmap_LoadFullHuffman.Index = 3;
+            this.HW_Fitmap_LoadFullHuffman.Text = "LoadFullHuffman";
+            this.HW_Fitmap_LoadFullHuffman.Click += new System.EventHandler(this.HW_Filter_Fitmap_LoadFullHuffman);
+            // 
+            // HW_Fitmap_ChannelHuffman
+            // 
+            this.HW_Fitmap_ChannelHuffman.Index = 4;
+            this.HW_Fitmap_ChannelHuffman.Text = "ChannelHuffman";
+            this.HW_Fitmap_ChannelHuffman.Click += new System.EventHandler(this.HW_Filter_Fitmap_ChannelHuffman);
+            // 
+            // HW_Fitmap_LoadChannelHuffman
+            // 
+            this.HW_Fitmap_LoadChannelHuffman.Index = 5;
+            this.HW_Fitmap_LoadChannelHuffman.Text = "LoadChannelHuffman";
+            this.HW_Fitmap_LoadChannelHuffman.Click += new System.EventHandler(this.HW_Filter_Fitmap_LoadChannelHuffman);
             // 
             // Form1
             // 
@@ -387,7 +424,13 @@ namespace CSharpFilters
 		[STAThread]
 		static void Main() 
 		{
-			Application.Run(new Form1());
+            byte[] bytes = new byte[]
+            {
+                255, 0, 20, 20, 13, 14, 18, 255, 0, 0, 0, 0, 1, 2, 1, 255, 255, 255, 255, 255, 255
+            };
+            HuffmanCode<byte> hCode = new HuffmanCode<byte>(bytes);
+
+            Application.Run(new Form1());
 		}
 
 		protected override void OnPaint (PaintEventArgs e)
@@ -663,6 +706,7 @@ namespace CSharpFilters
             Console.WriteLine($"Fitmap downsample");
             Fitmap f = Fitmap.SaveBitmap(m_Bitmap, "D:/file.fmp");
             m_Bitmap = f.GetBitmap();
+            m_Bitmap.Save("D:/bmpfmp1NoComp.bmp", ImageFormat.Bmp);
             this.Invalidate();
         }
 
@@ -672,6 +716,42 @@ namespace CSharpFilters
             m_Bitmap = Fitmap.LoadBitmapFromFile("D:/file.fmp");
             this.Invalidate();
         }
+
+        private void HW_Filter_Fitmap_FullHuffman(object sender, EventArgs e)
+        {
+            Console.WriteLine($"Fitmap Full Huffman");
+            Fitmap f = new Fitmap(m_Bitmap);
+            f.SetCompressionAlg(FitmapCompression.CompressionType.HuffmanFull);
+            f.SaveToFile("D:/file.fmp1");
+            m_Bitmap = f.GetBitmap();
+            this.Invalidate();
+        }
+
+        private void HW_Filter_Fitmap_LoadFullHuffman(object sender, EventArgs e)
+        {
+            Console.WriteLine($"Fitmap Full Huffman Load");
+            m_Bitmap = Fitmap.LoadBitmapFromFile("D:/file.fmp1");
+            this.Invalidate();
+        }
+
+        private void HW_Filter_Fitmap_ChannelHuffman(object sender, EventArgs e)
+        {
+            Console.WriteLine($"Fitmap Channel Huffman");
+            Fitmap f = new Fitmap(m_Bitmap);
+            f.SetCompressionAlg(FitmapCompression.CompressionType.HuffmanPerChannel);
+            f.SaveToFile("D:/file.fmp2");
+            m_Bitmap = f.GetBitmap();
+            this.Invalidate();
+        }
+
+        private void HW_Filter_Fitmap_LoadChannelHuffman(object sender, EventArgs e)
+        {
+            Console.WriteLine($"Load Fitmap Channel Huffman");
+            m_Bitmap = Fitmap.LoadBitmapFromFile("D:/file.fmp2");
+            this.Invalidate();
+        }
+
+
 
         private double[] GetGammaInput()
         {
