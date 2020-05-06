@@ -92,6 +92,7 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Compression.cs" />
+    <Compile Include="Dither.cs" />
     <Compile Include="Filters.cs">
       <SubType>Code</SubType>
     </Compile>

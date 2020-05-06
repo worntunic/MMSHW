@@ -58,6 +58,10 @@ namespace CSharpFilters
         private MenuItem HW_Fitmap_LoadFullHuffman;
         private MenuItem HW_Fitmap_ChannelHuffman;
         private MenuItem HW_Fitmap_LoadChannelHuffman;
+        private MenuItem menuItem7;
+        private MenuItem HW_Dither_BNW;
+        private MenuItem HW_Dither_Gameboy;
+        private MenuItem HW_Dither_C64;
         private IContainer components;
 
 		public Form1()
@@ -129,6 +133,10 @@ namespace CSharpFilters
             this.HW_Fitmap_LoadFullHuffman = new System.Windows.Forms.MenuItem();
             this.HW_Fitmap_ChannelHuffman = new System.Windows.Forms.MenuItem();
             this.HW_Fitmap_LoadChannelHuffman = new System.Windows.Forms.MenuItem();
+            this.menuItem7 = new System.Windows.Forms.MenuItem();
+            this.HW_Dither_BNW = new System.Windows.Forms.MenuItem();
+            this.HW_Dither_Gameboy = new System.Windows.Forms.MenuItem();
+            this.HW_Dither_C64 = new System.Windows.Forms.MenuItem();
             this.SuspendLayout();
             // 
             // mainMenu1
@@ -139,7 +147,8 @@ namespace CSharpFilters
             this.menuItem4,
             this.menuItem2,
             this.menuItem3,
-            this.menuItem6});
+            this.menuItem6,
+            this.menuItem7});
             // 
             // menuItem1
             // 
@@ -402,6 +411,33 @@ namespace CSharpFilters
             this.HW_Fitmap_LoadChannelHuffman.Index = 5;
             this.HW_Fitmap_LoadChannelHuffman.Text = "LoadChannelHuffman";
             this.HW_Fitmap_LoadChannelHuffman.Click += new System.EventHandler(this.HW_Filter_Fitmap_LoadChannelHuffman);
+            // 
+            // menuItem7
+            // 
+            this.menuItem7.Index = 6;
+            this.menuItem7.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            this.HW_Dither_BNW,
+            this.HW_Dither_Gameboy,
+            this.HW_Dither_C64});
+            this.menuItem7.Text = "Dither";
+            // 
+            // HW_Dither_BNW
+            // 
+            this.HW_Dither_BNW.Index = 0;
+            this.HW_Dither_BNW.Text = "BNW";
+            this.HW_Dither_BNW.Click += new System.EventHandler(this.HW_Filter_Dither_BNW);
+            // 
+            // HW_Dither_Gameboy
+            // 
+            this.HW_Dither_Gameboy.Index = 1;
+            this.HW_Dither_Gameboy.Text = "Gameboy";
+            this.HW_Dither_Gameboy.Click += new System.EventHandler(this.HW_Filter_Dither_Gameboy);
+            // 
+            // HW_Dither_C64
+            // 
+            this.HW_Dither_C64.Index = 2;
+            this.HW_Dither_C64.Text = "C64";
+            this.HW_Dither_C64.Click += new System.EventHandler(this.HW_Filter_Dither_C64);
             // 
             // Form1
             // 
@@ -752,6 +788,24 @@ namespace CSharpFilters
         }
 
 
+        private void HW_Filter_Dither_BNW(object sender, EventArgs e)
+        {
+            Console.WriteLine($"Atkinson BNW Dither");
+            m_Bitmap = HWFilters.StockDithers.ApplyBNWBillAtkinson(m_Bitmap);
+            this.Invalidate();
+        }
+        private void HW_Filter_Dither_Gameboy(object sender, EventArgs e)
+        {
+            Console.WriteLine($"Atkinson Gameboy Dither");
+            m_Bitmap = HWFilters.StockDithers.ApplyGameboyBillAtkinson(m_Bitmap);
+            this.Invalidate();
+        }
+        private void HW_Filter_Dither_C64(object sender, EventArgs e)
+        {
+            Console.WriteLine($"Atkinson C64 Dither");
+            m_Bitmap = HWFilters.StockDithers.ApplyC64BillAtkinson(m_Bitmap);
+            this.Invalidate();
+        }
 
         private double[] GetGammaInput()
         {
@@ -780,6 +834,7 @@ namespace CSharpFilters
             }
             return retVal;
         }
+
 
     }
 }
