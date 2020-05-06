@@ -16,6 +16,9 @@ namespace CSharpFilters
 	/// </summary>
 	public class Form1 : System.Windows.Forms.Form
 	{
+
+        private bool ditherGS = false;
+
 		private System.Drawing.Bitmap m_Bitmap;
 		private System.Drawing.Bitmap m_Undo;
 		private System.Windows.Forms.MainMenu mainMenu1;
@@ -62,6 +65,14 @@ namespace CSharpFilters
         private MenuItem HW_Dither_BNW;
         private MenuItem HW_Dither_Gameboy;
         private MenuItem HW_Dither_C64;
+        private MenuItem HW_Dither_FullHisto;
+        private MenuItem HW_Dither_ChannelHisto;
+        private MenuItem HW_Dither_ToggleGS;
+        private MenuItem HW_Dither_ChannellDividedHisto;
+        private MenuItem HW_Dither_HSVHisto;
+        private MenuItem HW_Dither_FullHistoEvenBrightness;
+        private MenuItem HW_Dither_FullHistoEvenSaturation;
+        private MenuItem HW_Dither_FullHistoEvenHue;
         private IContainer components;
 
 		public Form1()
@@ -137,6 +148,14 @@ namespace CSharpFilters
             this.HW_Dither_BNW = new System.Windows.Forms.MenuItem();
             this.HW_Dither_Gameboy = new System.Windows.Forms.MenuItem();
             this.HW_Dither_C64 = new System.Windows.Forms.MenuItem();
+            this.HW_Dither_FullHisto = new System.Windows.Forms.MenuItem();
+            this.HW_Dither_ChannelHisto = new System.Windows.Forms.MenuItem();
+            this.HW_Dither_ChannellDividedHisto = new System.Windows.Forms.MenuItem();
+            this.HW_Dither_HSVHisto = new System.Windows.Forms.MenuItem();
+            this.HW_Dither_FullHistoEvenBrightness = new System.Windows.Forms.MenuItem();
+            this.HW_Dither_FullHistoEvenSaturation = new System.Windows.Forms.MenuItem();
+            this.HW_Dither_ToggleGS = new System.Windows.Forms.MenuItem();
+            this.HW_Dither_FullHistoEvenHue = new System.Windows.Forms.MenuItem();
             this.SuspendLayout();
             // 
             // mainMenu1
@@ -418,7 +437,15 @@ namespace CSharpFilters
             this.menuItem7.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
             this.HW_Dither_BNW,
             this.HW_Dither_Gameboy,
-            this.HW_Dither_C64});
+            this.HW_Dither_C64,
+            this.HW_Dither_FullHisto,
+            this.HW_Dither_ChannelHisto,
+            this.HW_Dither_ChannellDividedHisto,
+            this.HW_Dither_HSVHisto,
+            this.HW_Dither_FullHistoEvenBrightness,
+            this.HW_Dither_FullHistoEvenSaturation,
+            this.HW_Dither_FullHistoEvenHue,
+            this.HW_Dither_ToggleGS});
             this.menuItem7.Text = "Dither";
             // 
             // HW_Dither_BNW
@@ -438,6 +465,54 @@ namespace CSharpFilters
             this.HW_Dither_C64.Index = 2;
             this.HW_Dither_C64.Text = "C64";
             this.HW_Dither_C64.Click += new System.EventHandler(this.HW_Filter_Dither_C64);
+            // 
+            // HW_Dither_FullHisto
+            // 
+            this.HW_Dither_FullHisto.Index = 3;
+            this.HW_Dither_FullHisto.Text = "FullHisto";
+            this.HW_Dither_FullHisto.Click += new System.EventHandler(this.HW_Filter_Dither_FullHisto);
+            // 
+            // HW_Dither_ChannelHisto
+            // 
+            this.HW_Dither_ChannelHisto.Index = 4;
+            this.HW_Dither_ChannelHisto.Text = "ChannellHisto";
+            this.HW_Dither_ChannelHisto.Click += new System.EventHandler(this.HW_Filter_Dither_ChannellHisto);
+            // 
+            // HW_Dither_ChannellDividedHisto
+            // 
+            this.HW_Dither_ChannellDividedHisto.Index = 5;
+            this.HW_Dither_ChannellDividedHisto.Text = "ChannelDividedHisto";
+            this.HW_Dither_ChannellDividedHisto.Click += new System.EventHandler(this.HW_Filter_Dither_ChannellDividedHisto);
+            // 
+            // HW_Dither_HSVHisto
+            // 
+            this.HW_Dither_HSVHisto.Index = 6;
+            this.HW_Dither_HSVHisto.Text = "HSVHisto";
+            this.HW_Dither_HSVHisto.Click += new System.EventHandler(this.HW_Filter_Dither_HSVHisto);
+            // 
+            // HW_Dither_FullHistoEvenBrightness
+            // 
+            this.HW_Dither_FullHistoEvenBrightness.Index = 7;
+            this.HW_Dither_FullHistoEvenBrightness.Text = "FullHistoEvenBrightness";
+            this.HW_Dither_FullHistoEvenBrightness.Click += new System.EventHandler(this.HW_Filter_Dither_FullHistoEvenBrightness);
+            // 
+            // HW_Dither_FullHistoEvenSaturation
+            // 
+            this.HW_Dither_FullHistoEvenSaturation.Index = 8;
+            this.HW_Dither_FullHistoEvenSaturation.Text = "FullHistoEvenSaturation";
+            this.HW_Dither_FullHistoEvenSaturation.Click += new System.EventHandler(this.HW_Filter_Dither_FullHistoEvenSaturation);
+            // 
+            // HW_Dither_ToggleGS
+            // 
+            this.HW_Dither_ToggleGS.Index = 10;
+            this.HW_Dither_ToggleGS.Text = "ToggleGS";
+            this.HW_Dither_ToggleGS.Click += new System.EventHandler(this.HW_Filter_Dither_ToggleGS);
+            // 
+            // HW_Dither_FullHistoEvenHue
+            // 
+            this.HW_Dither_FullHistoEvenHue.Index = 9;
+            this.HW_Dither_FullHistoEvenHue.Text = "FullHistoEvenHue";
+            this.HW_Dither_FullHistoEvenHue.Click += new System.EventHandler(this.HW_Filter_Dither_FullHistoEvenHue);
             // 
             // Form1
             // 
@@ -791,22 +866,85 @@ namespace CSharpFilters
         private void HW_Filter_Dither_BNW(object sender, EventArgs e)
         {
             Console.WriteLine($"Atkinson BNW Dither");
-            m_Bitmap = HWFilters.StockDithers.ApplyBNWBillAtkinson(m_Bitmap);
+            m_Bitmap = HWFilters.StockDithers.ApplyBNWBillAtkinson(m_Bitmap, ditherGS);
             this.Invalidate();
         }
         private void HW_Filter_Dither_Gameboy(object sender, EventArgs e)
         {
             Console.WriteLine($"Atkinson Gameboy Dither");
-            m_Bitmap = HWFilters.StockDithers.ApplyGameboyBillAtkinson(m_Bitmap);
+            m_Bitmap = HWFilters.StockDithers.ApplyGameboyBillAtkinson(m_Bitmap, ditherGS);
             this.Invalidate();
         }
         private void HW_Filter_Dither_C64(object sender, EventArgs e)
         {
             Console.WriteLine($"Atkinson C64 Dither");
-            m_Bitmap = HWFilters.StockDithers.ApplyC64BillAtkinson(m_Bitmap);
+            m_Bitmap = HWFilters.StockDithers.ApplyC64BillAtkinson(m_Bitmap, ditherGS);
+            this.Invalidate();
+        }
+        private void HW_Filter_Dither_FullHisto(object sender, EventArgs e)
+        {
+            int paletteSize = GetIntInput();
+            Console.WriteLine($"Full Histo Dither, palleteSize {paletteSize}");
+            Palette palette = StockPalettes.FromColorHisto(m_Bitmap, paletteSize);
+            m_Bitmap = HWFilters.StockDithers.ApplyBillAtkinson(m_Bitmap, palette, ditherGS);
             this.Invalidate();
         }
 
+        private void HW_Filter_Dither_ChannellHisto(object sender, EventArgs e)
+        {
+            int paletteSize = GetIntInput();
+            Console.WriteLine($"Channell Histo Dither, palleteSize {paletteSize}");
+            Palette palette = StockPalettes.FromChannellHisto(m_Bitmap, paletteSize);
+            m_Bitmap = HWFilters.StockDithers.ApplyBillAtkinson(m_Bitmap, palette, ditherGS);
+            this.Invalidate();
+        }
+
+
+        private void HW_Filter_Dither_ChannellDividedHisto(object sender, EventArgs e)
+        {
+            int paletteSize = GetIntInput();
+            Console.WriteLine($"Channell Divided Histo Dither, palleteSize {paletteSize}");
+            Palette palette = StockPalettes.FromChannellDividedHisto(m_Bitmap, paletteSize);
+            m_Bitmap = HWFilters.StockDithers.ApplyBillAtkinson(m_Bitmap, palette, ditherGS);
+            this.Invalidate();
+        }
+
+        private void HW_Filter_Dither_HSVHisto(object sender, EventArgs e)
+        {
+            int paletteSize = GetIntInput();
+            Console.WriteLine($"Channell HSV Histo Dither, palleteSize {paletteSize}");
+            Palette palette = StockPalettes.FromHSBHisto(m_Bitmap, paletteSize);
+            m_Bitmap = HWFilters.StockDithers.ApplyBillAtkinson(m_Bitmap, palette, ditherGS);
+            this.Invalidate();
+        }
+
+        private void HW_Filter_Dither_FullHistoEvenBrightness(object sender, EventArgs e)
+        {
+            int paletteSize = GetIntInput();
+            Console.WriteLine($"Channell HSV Histo Dither Even Brightness, palleteSize {paletteSize}");
+            Palette palette = StockPalettes.FromEvenBrightnessColorHisto(m_Bitmap, paletteSize);
+            m_Bitmap = HWFilters.StockDithers.ApplyBillAtkinson(m_Bitmap, palette, ditherGS);
+            this.Invalidate();
+        }
+
+
+        private void HW_Filter_Dither_FullHistoEvenSaturation(object sender, EventArgs e)
+        {
+            int paletteSize = GetIntInput();
+            Console.WriteLine($"Channell HSV Histo Dither Even Saturation, palleteSize {paletteSize}");
+            Palette palette = StockPalettes.FromEvenSaturationColorHisto(m_Bitmap, paletteSize);
+            m_Bitmap = HWFilters.StockDithers.ApplyBillAtkinson(m_Bitmap, palette, ditherGS);
+            this.Invalidate();
+        }
+
+        private void HW_Filter_Dither_FullHistoEvenHue(object sender, EventArgs e)
+        {
+            int paletteSize = GetIntInput();
+            Console.WriteLine($"Channell HSV Histo Dither Even Hue, palleteSize {paletteSize}");
+            Palette palette = StockPalettes.FromEvenHueColorHisto(m_Bitmap, paletteSize);
+            m_Bitmap = HWFilters.StockDithers.ApplyBillAtkinson(m_Bitmap, palette, ditherGS);
+            this.Invalidate();
+        }
         private double[] GetGammaInput()
         {
             GammaInput dlg = new GammaInput();
@@ -835,6 +973,11 @@ namespace CSharpFilters
             return retVal;
         }
 
+        private void HW_Filter_Dither_ToggleGS(object sender, EventArgs e)
+        {
+            ditherGS = !ditherGS;
+            Console.WriteLine($"Grayscale " + (ditherGS ? "on" : "off"));
+        }
 
     }
 }
