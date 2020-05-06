@@ -88,7 +88,7 @@ namespace HWFilters
             }
             //Reconstruct tree
             HuffmanTree<byte> hfTree = HuffmanTree<byte>.ReconstructFromTable(readTable);
-            hfTree.PrintTree();
+            //hfTree.PrintTree();
             //Read values to bytes
             int bufferSize = 128;
             BitArray buffer = bitStream.ReadBits(bufferSize);

@@ -9,15 +9,21 @@ namespace HWFilters
     public class BitStream
     {
         FileStream fStream;
-        private const int bufferLength = 256;
-        byte[] writeBuffer = new byte[bufferLength];
+        private int bufferLength;
+        byte[] writeBuffer;
         int writeBufferCount;
         UInt32 currentBuffer;
         int currentBufferCount = 0;
         BitArray alreadyReadBits = new BitArray(0);
 
-        public BitStream(FileStream stream)
+        public BitStream(FileStream stream, int bufferLength = 1024)
         {
+            if (bufferLength % 8 != 0)
+            {
+                throw new ArgumentException("Buffer length must be a multiple of 8");
+            }
+            this.bufferLength = bufferLength;
+            writeBuffer = new byte[bufferLength];
             this.fStream = stream;
         }
         public BitArray ReadBits(int numberOfBits)

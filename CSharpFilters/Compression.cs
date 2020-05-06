@@ -438,7 +438,7 @@ namespace HWFilters.Compression
         {
             HuffmanList<T> list = GenerateStartingList(startingData);
             tree = GenerateTree(list);
-            tree.PrintTree();
+            //tree.PrintTree();
         }
 
         public Dictionary<HFCode, T> GetReadingTable()
