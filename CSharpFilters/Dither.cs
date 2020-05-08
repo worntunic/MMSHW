@@ -6,6 +6,23 @@ using System.Text;
 
 namespace HWFilters
 {
+    /// <summary>
+    /// Najlakši način da se izvrši funkcija za domaći je pozivom statičke funkcije
+    /// HWFilters.StockDithers.ApplyBNWBillAtkinson(Bitmap bitmap, bool applyGS)
+    /// 
+    /// Gde je bitmap slika na koju primenjujemo diter
+    /// A applyGS oznaka da li se na sliku pre primene ditera treba primeniti grayscale
+    /// (Za ovo nisam bio siguran, jer neki primeri rade to a neki ne)
+    /// 
+    /// Ako hoćete druge palete (a ne crno-belu), funkcija
+    /// HWFilters.StockDithers.ApplyBillAtkinson(Bitmap bitmap, Palette palette, bool applyGS)
+    /// kao drugi parametar prima paletu boja koje će diter da koristi.
+    /// U StockPalettes ima nekoliko već napravljenih paleta (Black and White, Gameboy, Commodore64)
+    /// 
+    /// I na kraju, neoptimalno i nerazrađeno, ali u HistogramPalettes sam se igrao sa generisanjem
+    /// paleta na osnovu ulazne slike, i naravno neke od njih daju užasne i nepredvidive rezultate
+    /// Ali nekad ispadne i nešto dobro
+    /// </summary>
     public struct DitherFactor
     {
         public int xOffset;
@@ -231,6 +248,15 @@ namespace HWFilters
                 return c64;
             }
         }
+    }
+    static class HistogramPalettes
+    {
+        /// <summary>
+        /// Creates a palette from input image, gathering paletteSize number of most frequent colors
+        /// </summary>
+        /// <param name="bmp">Input image</param>
+        /// <param name="paletteSize">Number of colors in a palette</param>
+        /// <returns></returns>
         public static Palette FromColorHisto(Bitmap bmp, int paletteSize)
         {
             Dictionary<Color, int> colorHisto = new Dictionary<Color, int>();
@@ -242,7 +268,8 @@ namespace HWFilters
                     if (colorHisto.ContainsKey(clr))
                     {
                         colorHisto[clr]++;
-                    } else
+                    }
+                    else
                     {
                         colorHisto.Add(clr, 1);
                     }
@@ -255,7 +282,8 @@ namespace HWFilters
                 Color maxColor = Color.White;
                 foreach (KeyValuePair<Color, int> pair in colorHisto)
                 {
-                    if (pair.Value >= maxVal) {
+                    if (pair.Value >= maxVal)
+                    {
                         maxVal = pair.Value;
                         maxColor = pair.Key;
                     }
@@ -265,6 +293,13 @@ namespace HWFilters
             }
             return palette;
         }
+        /// <summary>
+        /// Creates a palette from input image, gathering most frequent color for each brightness bandwidth,
+        /// where each bandwidth is wide (1 / paletteSize)
+        /// </summary>
+        /// <param name="bmp">Input image</param>
+        /// <param name="paletteSize">Number of colors in a palette</param>
+        /// <returns></returns>
         public static Palette FromEvenBrightnessColorHisto(Bitmap bmp, int paletteSize)
         {
             Dictionary<Color, int> colorHisto = new Dictionary<Color, int>();
@@ -303,6 +338,13 @@ namespace HWFilters
             }
             return palette;
         }
+        /// <summary>
+        /// Creates a palette from input image, gathering most frequent color for each saturation bandwidth,
+        /// where each bandwidth is wide (1 / paletteSize)
+        /// </summary>
+        /// <param name="bmp">Input image</param>
+        /// <param name="paletteSize">Number of colors in a palette</param>
+        /// <returns></returns>
         public static Palette FromEvenSaturationColorHisto(Bitmap bmp, int paletteSize)
         {
             Dictionary<Color, int> colorHisto = new Dictionary<Color, int>();
@@ -341,6 +383,13 @@ namespace HWFilters
             }
             return palette;
         }
+        /// <summary>
+        /// Creates a palette from input image, gathering most frequent color for each hue bandwidth,
+        /// where each bandwidth is wide (1 / paletteSize)
+        /// </summary>
+        /// <param name="bmp">Input image</param>
+        /// <param name="paletteSize">Number of colors in a palette</param>
+        /// <returns></returns>
         public static Palette FromEvenHueColorHisto(Bitmap bmp, int paletteSize)
         {
             Dictionary<Color, int> colorHisto = new Dictionary<Color, int>();
@@ -379,7 +428,14 @@ namespace HWFilters
             }
             return palette;
         }
-        public static Palette FromChannellHisto(Bitmap bmp, int paletteSize)
+        /// <summary>
+        /// Creates a palette from input image, gathering third of the colors from most frequent
+        /// colors for each of Red, Green and Blue channels, and then combines those channels based on most frequent values for each
+        /// </summary>
+        /// <param name="bmp">Input image</param>
+        /// <param name="paletteSize">Number of colors in a palette</param>
+        /// <returns></returns>
+        public static Palette FromChannelHisto(Bitmap bmp, int paletteSize)
         {
             Dictionary<byte, int> rHisto = new Dictionary<byte, int>();
             Dictionary<byte, int> gHisto = new Dictionary<byte, int>();
@@ -454,7 +510,15 @@ namespace HWFilters
             }
             return palette;
         }
-        public static Palette FromChannellDividedHisto(Bitmap bmp, int paletteSize)
+        /// <summary>
+        /// Creates a palette from input image, first gathering most frequent colors in general, and most frequent for Red, Green and Blue channel.
+        /// Then palette colors are created by using (paletteSize / 3) first colors from most frequent colors, and generating three new colors by
+        /// Changing the channel for each of the Red, Green and Blue most frequent values
+        /// </summary>
+        /// <param name="bmp">Input image</param>
+        /// <param name="paletteSize">Number of colors in a palette</param>
+        /// <returns></returns>
+        public static Palette FromChannelDividedHisto(Bitmap bmp, int paletteSize)
         {
             Dictionary<Color, int> colorHisto = new Dictionary<Color, int>();
             Dictionary<byte, int> rHisto = new Dictionary<byte, int>();
@@ -468,7 +532,8 @@ namespace HWFilters
                     if (colorHisto.ContainsKey(clr))
                     {
                         colorHisto[clr]++;
-                    } else
+                    }
+                    else
                     {
                         colorHisto.Add(clr, 1);
                     }
@@ -550,7 +615,13 @@ namespace HWFilters
             }
             return palette;
         }
-
+        /// <summary>
+        /// Creates a palette from input image, gathering third of the colors from most frequent
+        /// colors for each of Hue, Saturation and Brightness channels, and then combines those channels based on most frequent values for each
+        /// </summary>
+        /// <param name="bmp">Input image</param>
+        /// <param name="paletteSize">Number of colors in a palette</param>
+        /// <returns></returns>
         public static Palette FromHSBHisto(Bitmap bmp, int paletteSize)
         {
             Dictionary<decimal, int> hHisto = new Dictionary<decimal, int>();
@@ -625,7 +696,7 @@ namespace HWFilters
                 hHisto.Remove(h);
                 sHisto.Remove(s);
                 bHisto.Remove(b);
-                
+
                 palette.AddColor(HSVToRGB(Decimal.ToDouble(h), Decimal.ToDouble(s), Decimal.ToDouble(b)));
             }
             return palette;
@@ -653,17 +724,11 @@ namespace HWFilters
                 double tv = V * (1 - S * (1 - f));
                 switch (i)
                 {
-
-                    // Red is the dominant color
-
                     case 0:
                         R = V;
                         G = tv;
                         B = pv;
                         break;
-
-                    // Green is the dominant color
-
                     case 1:
                         R = qv;
                         G = V;
@@ -674,9 +739,6 @@ namespace HWFilters
                         G = V;
                         B = tv;
                         break;
-
-                    // Blue is the dominant color
-
                     case 3:
                         R = pv;
                         G = qv;
@@ -687,17 +749,11 @@ namespace HWFilters
                         G = pv;
                         B = V;
                         break;
-
-                    // Red is the dominant color
-
                     case 5:
                         R = V;
                         G = pv;
                         B = qv;
                         break;
-
-                    // Just in case we overshoot on our math by a little, we put these here. Since its a switch it won't slow us down at all to put these here.
-
                     case 6:
                         R = V;
                         G = tv;
@@ -709,28 +765,15 @@ namespace HWFilters
                         B = qv;
                         break;
 
-                    // The color is not defined, we should throw an error.
-
                     default:
-                        //LFATAL("i Value error in Pixel conversion, Value is %d", i);
-                        R = G = B = V; // Just pretend its black/white
+                        R = G = B = V;
                         break;
                 }
             }
-            int r = Clamp((int)(R * 255.0));
-            int g = Clamp((int)(G * 255.0));
-            int b = Clamp((int)(B * 255.0));
+            int r = MathUtils.Clamp((int)(R * 255.0), 0, 255);
+            int g = MathUtils.Clamp((int)(G * 255.0), 0, 255);
+            int b = MathUtils.Clamp((int)(B * 255.0), 0, 255);
             return Color.FromArgb(r, g, b);
-        }
-
-        /// <summary>
-        /// Clamp a value to 0-255
-        /// </summary>
-        private static int Clamp(int i)
-        {
-            if (i < 0) return 0;
-            if (i > 255) return 255;
-            return i;
         }
     }
 }

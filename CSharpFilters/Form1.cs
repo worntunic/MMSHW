@@ -68,7 +68,7 @@ namespace CSharpFilters
         private MenuItem HW_Dither_FullHisto;
         private MenuItem HW_Dither_ChannelHisto;
         private MenuItem HW_Dither_ToggleGS;
-        private MenuItem HW_Dither_ChannellDividedHisto;
+        private MenuItem HW_Dither_ChannelDividedHisto;
         private MenuItem HW_Dither_HSVHisto;
         private MenuItem HW_Dither_FullHistoEvenBrightness;
         private MenuItem HW_Dither_FullHistoEvenSaturation;
@@ -150,7 +150,7 @@ namespace CSharpFilters
             this.HW_Dither_C64 = new System.Windows.Forms.MenuItem();
             this.HW_Dither_FullHisto = new System.Windows.Forms.MenuItem();
             this.HW_Dither_ChannelHisto = new System.Windows.Forms.MenuItem();
-            this.HW_Dither_ChannellDividedHisto = new System.Windows.Forms.MenuItem();
+            this.HW_Dither_ChannelDividedHisto = new System.Windows.Forms.MenuItem();
             this.HW_Dither_HSVHisto = new System.Windows.Forms.MenuItem();
             this.HW_Dither_FullHistoEvenBrightness = new System.Windows.Forms.MenuItem();
             this.HW_Dither_FullHistoEvenSaturation = new System.Windows.Forms.MenuItem();
@@ -440,7 +440,7 @@ namespace CSharpFilters
             this.HW_Dither_C64,
             this.HW_Dither_FullHisto,
             this.HW_Dither_ChannelHisto,
-            this.HW_Dither_ChannellDividedHisto,
+            this.HW_Dither_ChannelDividedHisto,
             this.HW_Dither_HSVHisto,
             this.HW_Dither_FullHistoEvenBrightness,
             this.HW_Dither_FullHistoEvenSaturation,
@@ -475,14 +475,14 @@ namespace CSharpFilters
             // HW_Dither_ChannelHisto
             // 
             this.HW_Dither_ChannelHisto.Index = 4;
-            this.HW_Dither_ChannelHisto.Text = "ChannellHisto";
-            this.HW_Dither_ChannelHisto.Click += new System.EventHandler(this.HW_Filter_Dither_ChannellHisto);
+            this.HW_Dither_ChannelHisto.Text = "ChannelHisto";
+            this.HW_Dither_ChannelHisto.Click += new System.EventHandler(this.HW_Filter_Dither_ChannelHisto);
             // 
-            // HW_Dither_ChannellDividedHisto
+            // HW_Dither_ChannelDividedHisto
             // 
-            this.HW_Dither_ChannellDividedHisto.Index = 5;
-            this.HW_Dither_ChannellDividedHisto.Text = "ChannelDividedHisto";
-            this.HW_Dither_ChannellDividedHisto.Click += new System.EventHandler(this.HW_Filter_Dither_ChannellDividedHisto);
+            this.HW_Dither_ChannelDividedHisto.Index = 5;
+            this.HW_Dither_ChannelDividedHisto.Text = "ChannelDividedHisto";
+            this.HW_Dither_ChannelDividedHisto.Click += new System.EventHandler(this.HW_Filter_Dither_ChannelDividedHisto);
             // 
             // HW_Dither_HSVHisto
             // 
@@ -815,9 +815,8 @@ namespace CSharpFilters
         private void HW_Filter_Fitmap_Downsample(object sender, EventArgs e)
         {
             Console.WriteLine($"Fitmap downsample");
-            Fitmap f = Fitmap.SaveBitmap(m_Bitmap, "D:/file.fmp");
+            Fitmap f = Fitmap.SaveBitmap(m_Bitmap, "D:/file.fmp", FitmapCompression.CompressionType.NoCompression);
             m_Bitmap = f.GetBitmap();
-            m_Bitmap.Save("D:/bmpfmp1NoComp.bmp", ImageFormat.Bmp);
             this.Invalidate();
         }
 
@@ -831,9 +830,7 @@ namespace CSharpFilters
         private void HW_Filter_Fitmap_FullHuffman(object sender, EventArgs e)
         {
             Console.WriteLine($"Fitmap Full Huffman");
-            Fitmap f = new Fitmap(m_Bitmap);
-            f.SetCompressionAlg(FitmapCompression.CompressionType.HuffmanFull);
-            f.SaveToFile("D:/file.fmp1");
+            Fitmap f = Fitmap.SaveBitmap(m_Bitmap, "D:/file.fmp1", FitmapCompression.CompressionType.HuffmanFull);
             m_Bitmap = f.GetBitmap();
             this.Invalidate();
         }
@@ -848,9 +845,7 @@ namespace CSharpFilters
         private void HW_Filter_Fitmap_ChannelHuffman(object sender, EventArgs e)
         {
             Console.WriteLine($"Fitmap Channel Huffman");
-            Fitmap f = new Fitmap(m_Bitmap);
-            f.SetCompressionAlg(FitmapCompression.CompressionType.HuffmanPerChannel);
-            f.SaveToFile("D:/file.fmp2");
+            Fitmap f = Fitmap.SaveBitmap(m_Bitmap, "D:/file.fmp2", FitmapCompression.CompressionType.HuffmanPerChannel);
             m_Bitmap = f.GetBitmap();
             this.Invalidate();
         }
@@ -885,26 +880,26 @@ namespace CSharpFilters
         {
             int paletteSize = GetIntInput();
             Console.WriteLine($"Full Histo Dither, palleteSize {paletteSize}");
-            Palette palette = StockPalettes.FromColorHisto(m_Bitmap, paletteSize);
+            Palette palette = HistogramPalettes.FromColorHisto(m_Bitmap, paletteSize);
             m_Bitmap = HWFilters.StockDithers.ApplyBillAtkinson(m_Bitmap, palette, ditherGS);
             this.Invalidate();
         }
 
-        private void HW_Filter_Dither_ChannellHisto(object sender, EventArgs e)
+        private void HW_Filter_Dither_ChannelHisto(object sender, EventArgs e)
         {
             int paletteSize = GetIntInput();
-            Console.WriteLine($"Channell Histo Dither, palleteSize {paletteSize}");
-            Palette palette = StockPalettes.FromChannellHisto(m_Bitmap, paletteSize);
+            Console.WriteLine($"Channel Histo Dither, palleteSize {paletteSize}");
+            Palette palette = HistogramPalettes.FromChannelHisto(m_Bitmap, paletteSize);
             m_Bitmap = HWFilters.StockDithers.ApplyBillAtkinson(m_Bitmap, palette, ditherGS);
             this.Invalidate();
         }
 
 
-        private void HW_Filter_Dither_ChannellDividedHisto(object sender, EventArgs e)
+        private void HW_Filter_Dither_ChannelDividedHisto(object sender, EventArgs e)
         {
             int paletteSize = GetIntInput();
-            Console.WriteLine($"Channell Divided Histo Dither, palleteSize {paletteSize}");
-            Palette palette = StockPalettes.FromChannellDividedHisto(m_Bitmap, paletteSize);
+            Console.WriteLine($"Channel Divided Histo Dither, palleteSize {paletteSize}");
+            Palette palette = HistogramPalettes.FromChannelDividedHisto(m_Bitmap, paletteSize);
             m_Bitmap = HWFilters.StockDithers.ApplyBillAtkinson(m_Bitmap, palette, ditherGS);
             this.Invalidate();
         }
@@ -912,8 +907,8 @@ namespace CSharpFilters
         private void HW_Filter_Dither_HSVHisto(object sender, EventArgs e)
         {
             int paletteSize = GetIntInput();
-            Console.WriteLine($"Channell HSV Histo Dither, palleteSize {paletteSize}");
-            Palette palette = StockPalettes.FromHSBHisto(m_Bitmap, paletteSize);
+            Console.WriteLine($"Channel HSV Histo Dither, palleteSize {paletteSize}");
+            Palette palette = HistogramPalettes.FromHSBHisto(m_Bitmap, paletteSize);
             m_Bitmap = HWFilters.StockDithers.ApplyBillAtkinson(m_Bitmap, palette, ditherGS);
             this.Invalidate();
         }
@@ -921,8 +916,8 @@ namespace CSharpFilters
         private void HW_Filter_Dither_FullHistoEvenBrightness(object sender, EventArgs e)
         {
             int paletteSize = GetIntInput();
-            Console.WriteLine($"Channell HSV Histo Dither Even Brightness, palleteSize {paletteSize}");
-            Palette palette = StockPalettes.FromEvenBrightnessColorHisto(m_Bitmap, paletteSize);
+            Console.WriteLine($"Channel HSV Histo Dither Even Brightness, palleteSize {paletteSize}");
+            Palette palette = HistogramPalettes.FromEvenBrightnessColorHisto(m_Bitmap, paletteSize);
             m_Bitmap = HWFilters.StockDithers.ApplyBillAtkinson(m_Bitmap, palette, ditherGS);
             this.Invalidate();
         }
@@ -931,8 +926,8 @@ namespace CSharpFilters
         private void HW_Filter_Dither_FullHistoEvenSaturation(object sender, EventArgs e)
         {
             int paletteSize = GetIntInput();
-            Console.WriteLine($"Channell HSV Histo Dither Even Saturation, palleteSize {paletteSize}");
-            Palette palette = StockPalettes.FromEvenSaturationColorHisto(m_Bitmap, paletteSize);
+            Console.WriteLine($"Channel HSV Histo Dither Even Saturation, palleteSize {paletteSize}");
+            Palette palette = HistogramPalettes.FromEvenSaturationColorHisto(m_Bitmap, paletteSize);
             m_Bitmap = HWFilters.StockDithers.ApplyBillAtkinson(m_Bitmap, palette, ditherGS);
             this.Invalidate();
         }
@@ -940,8 +935,8 @@ namespace CSharpFilters
         private void HW_Filter_Dither_FullHistoEvenHue(object sender, EventArgs e)
         {
             int paletteSize = GetIntInput();
-            Console.WriteLine($"Channell HSV Histo Dither Even Hue, palleteSize {paletteSize}");
-            Palette palette = StockPalettes.FromEvenHueColorHisto(m_Bitmap, paletteSize);
+            Console.WriteLine($"Channel HSV Histo Dither Even Hue, palleteSize {paletteSize}");
+            Palette palette = HistogramPalettes.FromEvenHueColorHisto(m_Bitmap, paletteSize);
             m_Bitmap = HWFilters.StockDithers.ApplyBillAtkinson(m_Bitmap, palette, ditherGS);
             this.Invalidate();
         }

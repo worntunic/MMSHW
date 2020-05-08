@@ -6,13 +6,24 @@ using System.IO;
 namespace HWFilters
 {
     /// <summary>
-    /// Najlakši način da se izvrše metode za domaći je pozivanjem dve statičke funkcije:
+    /// Najlakši način da se snimi podatak za treći i četvrti domaći je pozivanjem statičke funkcije:
     /// 
-    /// HWFilters.Fitmap.SaveBitmap(bitmap, fileName);
+    /// HWFilters.Fitmap.SaveBitmap(bitmap, fileName, FitmapCompression.CompressionType compressionType);
+    /// 
     /// Gde je bitmap (tipa Bitmap) slika koju pretvaramo u fitmap i snimamo u putanju fileName (tipa string)
+    /// A compressionType enum koji može da ima jednu od tri vrednosti:
+    /// NoCompression - ne koristi se algoritam za kompresiju (rezultat kao treći domaći)
+    /// FullHuffman - za kompresiju se koristi Hafmanov kod, kodirajući sve bajtove (c, m, y) i stvarajući jedan rečnik
+    /// HuffmanPerChannel - za kompresiju se koristi Hafmanov kod, bajtovi (c, m, y) se kodiraju odvojeno i stvaraju tri rečnika
+    /// 
+    /// Najlakši način za čitanje iz fajla je:
+    /// HWFilters.Fitmap.Save
     /// 
     /// HWFilters.Fitmap.LoadBitmapFromFile(fileName);
     /// Učitava Fitmap iz putanje fileName (tipa string) i pretvara ga u objekat tipa Bitmap (koji vraća)
+    /// 
+    /// Funkcija treba iz fajla da zaključi o kojoj se kompresiji radi i da se ponaša shodno tome.
+    /// Funkcija takođe radi i sa "starim" formatom, odnosno slikama snimljenim u verziji za treći domaći.
     /// </summary>
     public class Fitmap
     {      
@@ -229,9 +240,10 @@ namespace HWFilters
         }
         #endregion
         #region Homework Assignments
-        public static Fitmap SaveBitmap(Bitmap bmp, string fileName)
+        public static Fitmap SaveBitmap(Bitmap bmp, string fileName, FitmapCompression.CompressionType compressionType)
         {
             Fitmap f = new Fitmap(bmp);
+            f.SetCompressionAlg(compressionType);
             f.SaveToFile(fileName);
             return f;
         }
